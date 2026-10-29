@@ -1,0 +1,1405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>RGB → Grayscale → BGR </title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f6fa;
+    color: #172033;
+}
+
+.container {
+    max-width: 1150px;
+    margin: auto;
+    padding: 30px;
+}
+
+.card {
+    background: white;
+    border: 1px solid #dde3ed;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 22px;
+    box-shadow: 0 5px 18px rgba(0,0,0,0.06);
+}
+
+h1 {
+    margin-bottom: 8px;
+}
+
+.subtitle {
+    color: #667085;
+    margin-bottom: 25px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+}
+
+@media(max-width: 800px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.slider-row {
+    display: grid;
+    grid-template-columns: 90px 1fr 60px;
+    gap: 10px;
+    align-items: center;
+    margin: 16px 0;
+}
+
+input[type="range"] {
+    width: 100%;
+}
+
+.value {
+    background: #eef2f7;
+    border-radius: 8px;
+    padding: 7px;
+    text-align: center;
+    font-family: monospace;
+    font-weight: bold;
+}
+
+.swatch {
+    height: 180px;
+    border-radius: 14px;
+    border: 2px solid #d8dee8;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 20px;
+    font-weight: bold;
+
+    text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+}
+
+.pill {
+    display: inline-block;
+    background: #eef2f7;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-family: monospace;
+    font-weight: bold;
+    margin: 4px;
+}
+
+.stage {
+    display: flex;
+    gap: 6px;
+    margin: 20px 0;
+}
+
+.stage div {
+    flex: 1;
+    padding: 11px;
+    text-align: center;
+    border-radius: 8px;
+    background: #e8ecf2;
+    font-weight: bold;
+}
+
+.stage .active {
+    background: #dce6ff;
+}
+
+.transition-container {
+    position: relative;
+    margin-top: 20px;
+}
+
+.transition-image {
+    width: 100%;
+    height: 230px;
+    border-radius: 15px;
+    border: 2px solid #d8dee8;
+}
+
+.transition-label {
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.formula {
+    background: #eef4ff;
+    border-left: 5px solid #5b78d1;
+    padding: 16px;
+    border-radius: 8px;
+    margin-top: 18px;
+    line-height: 1.7;
+}
+
+.question {
+    background: #fff8e6;
+    border: 1px solid #efd48a;
+    padding: 16px;
+    border-radius: 10px;
+    margin-top: 18px;
+}
+
+.answer {
+    display: none;
+    background: #eef8f1;
+    padding: 13px;
+    border-radius: 8px;
+    margin-top: 10px;
+}
+
+button {
+    padding: 10px 15px;
+    border: 1px solid #cbd3df;
+    border-radius: 9px;
+    background: white;
+    font-weight: bold;
+    cursor: pointer;
+    margin: 3px;
+}
+
+button:hover {
+    background: #f0f3f8;
+}
+
+.code {
+    background: #111827;
+    color: #e5e7eb;
+    padding: 16px;
+    border-radius: 10px;
+    font-family: Consolas, monospace;
+    line-height: 1.6;
+    overflow-x: auto;
+}
+
+canvas {
+    width: 100%;
+    border: 1px solid #d9e0ea;
+    border-radius: 12px;
+    background: #eee;
+    cursor: crosshair;
+}
+
+.info {
+    background: #f7f9fc;
+    border-radius: 10px;
+    padding: 15px;
+    margin-top: 12px;
+    font-family: Consolas, monospace;
+    line-height: 1.7;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🎨 RGB → Grayscale → BGR</h1>
+
+<div class="subtitle">
+Understand what is inside a color image before using OpenCV
+</div>
+
+
+<!-- ===================================================== -->
+<!-- 1. RGB MIXER -->
+<!-- ===================================================== -->
+
+<section class="card">
+
+<h2>1️⃣ Build a Color Pixel</h2>
+
+<p>
+A color pixel contains <b>three channel values</b>:
+Red, Green and Blue
+Each value ranges from <b>0 to 255</b>
+</p>
+
+<div class="grid">
+
+<div>
+
+<div class="slider-row">
+    <b>🔴 Red</b>
+
+    <input
+        id="red"
+        type="range"
+        min="0"
+        max="255"
+        value="220"
+    >
+
+    <div class="value" id="redValue">220</div>
+</div>
+
+
+<div class="slider-row">
+
+    <b>🟢 Green</b>
+
+    <input
+        id="green"
+        type="range"
+        min="0"
+        max="255"
+        value="80"
+    >
+
+    <div class="value" id="greenValue">80</div>
+
+</div>
+
+
+<div class="slider-row">
+
+    <b>🔵 Blue</b>
+
+    <input
+        id="blue"
+        type="range"
+        min="0"
+        max="255"
+        value="40"
+    >
+
+    <div class="value" id="blueValue">40</div>
+
+</div>
+
+
+<div>
+
+<span class="pill" id="rgbValue">
+RGB = [220, 80, 40]
+</span>
+
+<span class="pill" id="bgrValue">
+BGR = [40, 80, 220]
+</span>
+
+</div>
+
+</div>
+
+
+<div>
+
+<div
+    class="swatch"
+    id="colorSwatch"
+    style="background: rgb(220,80,40)"
+>
+COLOR PIXEL
+</div>
+
+<p style="color:#667085">
+
+Move the sliders.
+
+You are changing the actual numerical values
+that describe the pixel.
+
+</p>
+
+</div>
+
+</div>
+
+</section>
+
+
+
+<!-- ===================================================== -->
+<!-- 2. RGB → GRAYSCALE TRANSITION -->
+<!-- ===================================================== -->
+
+<section class="card">
+
+<h2>2️⃣ Watch the Transition: RGB → Grayscale</h2>
+
+<p>
+
+This is the most important part
+
+Instead of simply showing the final grayscale image
+watch the <b>color gradually disappear</b>
+
+</p>
+
+
+<div class="stage">
+
+<div id="stageRGB" class="active">
+RGB Color
+</div>
+
+<div id="stageTransition">
+Transition
+</div>
+
+<div id="stageGray">
+Grayscale
+</div>
+
+</div>
+
+
+<p>
+<b>Drag the slider slowly from left to right:</b>
+</p>
+
+
+<input
+    id="graySlider"
+    type="range"
+    min="0"
+    max="100"
+    value="0"
+    style="width:100%"
+>
+
+
+<div class="transition-container">
+
+<canvas
+    id="transitionCanvas"
+    width="800"
+    height="300"
+    class="transition-image"
+></canvas>
+
+<div
+    class="transition-label"
+    id="transitionLabel"
+>
+100% Color
+</div>
+
+</div>
+
+
+<div class="formula">
+
+<b>Look carefully at what changed:</b>
+
+<br><br>
+
+At the beginning:
+
+<span class="pill">
+R
+</span>
+
+<span class="pill">
+G
+</span>
+
+<span class="pill">
+B
+</span>
+
+→ three independent channel values
+
+<br><br>
+
+At the end:
+
+<span class="pill">
+Gray
+</span>
+
+→ one intensity value
+
+<br><br>
+
+Approximate conversion:
+
+<br>
+
+<b>
+Gray ≈ 0.299R + 0.587G + 0.114B
+</b>
+
+</div>
+
+
+<div class="question">
+
+<b>🤔 Ask the students:</b>
+
+<br><br>
+
+If a pixel starts as:
+
+<span class="pill">
+RGB = [220, 80, 40]
+</span>
+
+What happens to the separate Red, Green and Blue
+information when we convert it to grayscale?
+
+<br>
+
+<button onclick="showAnswer()">
+Show Answer
+</button>
+
+<div class="answer" id="answer">
+
+The three color channels are no longer stored as
+three independent color values
+
+The grayscale pixel is represented by
+<b>one intensity value</b> describing how bright or dark
+the pixel is
+
+So we move conceptually from:
+
+<br><br>
+
+<b>[R, G, B]</b>
+
+↓
+
+<b>[Gray]</b>
+
+</div>
+
+</div>
+
+</section>
+
+
+
+<!-- ===================================================== -->
+<!-- 3. CHANNELS -->
+<!-- ===================================================== -->
+
+<section class="card">
+
+<h2>3️⃣ Color Image → Red / Green / Blue Channels</h2>
+
+<p>
+
+A color image can be separated into three 2D channels
+
+Each channel is basically a matrix containing values
+from 0 to 255
+
+</p>
+
+
+<div>
+
+<button onclick="drawChannel('original')">
+Original
+</button>
+
+<button onclick="drawChannel('red')">
+Red Channel
+</button>
+
+<button onclick="drawChannel('green')">
+Green Channel
+</button>
+
+<button onclick="drawChannel('blue')">
+Blue Channel
+</button>
+
+</div>
+
+
+<canvas
+    id="channelCanvas"
+    width="800"
+    height="400"
+></canvas>
+
+
+<div
+    class="info"
+    id="channelInfo"
+>
+
+<b>Original:</b>
+
+Red + Green + Blue work together
+to produce the final color.
+
+</div>
+
+</section>
+
+
+
+<!-- ===================================================== -->
+<!-- 4. RGB VS BGR -->
+<!-- ===================================================== -->
+
+<section class="card">
+
+<h2>4️⃣ RGB vs BGR</h2>
+
+<p>
+
+Here the important point is:
+
+<b>
+Same three values
+</b>
+
+OpenCV commonly stores a 3-channel image
+in <b>BGR order</b>
+
+</p>
+
+
+<div class="grid">
+
+<div>
+
+<h3>RGB</h3>
+
+<div
+    class="swatch"
+    id="rgbBox"
+>
+</div>
+
+<div
+    class="info"
+    id="rgbInfo"
+>
+</div>
+
+</div>
+
+
+<div>
+
+<h3>OpenCV BGR</h3>
+
+<div
+    class="swatch"
+    id="bgrBox"
+>
+</div>
+
+<div
+    class="info"
+    id="bgrInfo"
+>
+</div>
+
+</div>
+
+</div>
+
+
+<div
+    class="code"
+    style="margin-top:18px"
+>
+
+pixel = img[y, x]
+
+<br>
+
+B, G, R = img[y, x]
+
+<br><br>
+
+# OpenCV order
+
+[B, G, R]
+
+</div>
+
+</section>
+
+
+
+<!-- ===================================================== -->
+<!-- 5. PIXEL INSPECTION -->
+<!-- ===================================================== -->
+
+<section class="card">
+
+<h2>5️⃣ Interactive Pixel Inspection</h2>
+
+<p>
+
+Click anywhere on the image
+
+The computer will inspect that single pixel and show:
+
+</p>
+
+<ul>
+
+<li>RGB values</li>
+
+<li>BGR values</li>
+
+<li>Grayscale intensity</li>
+
+<li>The equivalent OpenCV expression</li>
+
+</ul>
+
+
+<canvas
+    id="inspectCanvas"
+    width="800"
+    height="400"
+></canvas>
+
+
+<div
+    class="info"
+    id="pixelInfo"
+>
+
+Click a pixel to inspect it.
+
+</div>
+
+</section>
+
+
+
+<!-- ===================================================== -->
+<!-- 6. FINAL MENTAL MODEL -->
+<!-- ===================================================== -->
+
+<section class="card">
+
+<h2>6️⃣ Final Mental Model</h2>
+
+
+<div class="code">
+
+COLOR IMAGE  -->
+
+Each pixel = [R, G, B]  = 3 Channels -->
+
+from RGB to GRAYSCALE -->
+
+Each pixel = one intensity value
+
+
+</div>
+
+</section>
+
+
+</div>
+
+
+
+<script>
+
+/* =========================================================
+   RGB SLIDERS
+========================================================= */
+
+const red = document.getElementById("red");
+const green = document.getElementById("green");
+const blue = document.getElementById("blue");
+
+
+function grayscaleValue(R, G, B) {
+
+    return Math.round(
+        0.299 * R +
+        0.587 * G +
+        0.114 * B
+    );
+
+}
+
+
+function updateRGB() {
+
+    const R = Number(red.value);
+    const G = Number(green.value);
+    const B = Number(blue.value);
+
+    document.getElementById("redValue").textContent = R;
+    document.getElementById("greenValue").textContent = G;
+    document.getElementById("blueValue").textContent = B;
+
+
+    document.getElementById("rgbValue").textContent =
+        `RGB = [${R}, ${G}, ${B}]`;
+
+
+    document.getElementById("bgrValue").textContent =
+        `BGR = [${B}, ${G}, ${R}]`;
+
+
+    const color =
+        `rgb(${R}, ${G}, ${B})`;
+
+
+    document.getElementById("colorSwatch")
+        .style.background = color;
+
+
+    document.getElementById("rgbBox")
+        .style.background = color;
+
+
+    document.getElementById("bgrBox")
+        .style.background = color;
+
+
+    document.getElementById("rgbInfo").innerHTML =
+        `RGB = [${R}, ${G}, ${B}]<br>
+         R = ${R}<br>
+         G = ${G}<br>
+         B = ${B}`;
+
+
+    document.getElementById("bgrInfo").innerHTML =
+        `BGR = [${B}, ${G}, ${R}]<br>
+         B = ${B}<br>
+         G = ${G}<br>
+         R = ${R}`;
+
+
+    drawTransition();
+
+    drawInspection();
+
+}
+
+
+/* =========================================================
+   RGB → GRAYSCALE TRANSITION
+========================================================= */
+
+const transitionCanvas =
+    document.getElementById("transitionCanvas");
+
+const transitionCtx =
+    transitionCanvas.getContext("2d");
+
+
+function drawTransition() {
+
+    const R = Number(red.value);
+    const G = Number(green.value);
+    const B = Number(blue.value);
+
+    const progress =
+        Number(document.getElementById("graySlider").value)
+        / 100;
+
+
+    const gray =
+        grayscaleValue(R, G, B);
+
+
+    /*
+       Instead of suddenly switching to grayscale
+       gradually move R, G and B toward the same
+       grayscale intensity
+    */
+
+    const currentR =
+        Math.round(R + (gray - R) * progress);
+
+    const currentG =
+        Math.round(G + (gray - G) * progress);
+
+    const currentB =
+        Math.round(B + (gray - B) * progress);
+
+
+    transitionCtx.fillStyle =
+        `rgb(${currentR},
+             ${currentG},
+             ${currentB})`;
+
+    transitionCtx.fillRect(
+        0,
+        0,
+        800,
+        300
+    );
+
+
+    /*
+       Draw a large pixel-like representation
+       in the center
+    */
+
+    transitionCtx.fillStyle =
+        "rgba(255,255,255,0.85)";
+
+    transitionCtx.font =
+        "bold 30px Arial";
+
+    transitionCtx.textAlign = "center";
+
+    transitionCtx.fillText(
+        `RGB = [${currentR}, ${currentG}, ${currentB}]`,
+        400,
+        135
+    );
+
+
+    transitionCtx.font =
+        "22px Arial";
+
+    transitionCtx.fillText(
+        `Gray intensity = ${gray}`,
+        400,
+        180
+    );
+
+
+    const percentage =
+        Math.round(progress * 100);
+
+
+    document.getElementById("transitionLabel")
+        .textContent =
+        `${100 - percentage}% Color → ${percentage}% Grayscale`;
+
+
+    document
+        .querySelectorAll(".stage div")
+        .forEach(x => x.classList.remove("active"));
+
+
+    if (percentage === 0) {
+
+        document
+            .getElementById("stageRGB")
+            .classList.add("active");
+
+    }
+
+    else if (percentage === 100) {
+
+        document
+            .getElementById("stageGray")
+            .classList.add("active");
+
+    }
+
+    else {
+
+        document
+            .getElementById("stageTransition")
+            .classList.add("active");
+
+    }
+
+}
+
+
+document
+    .getElementById("graySlider")
+    .addEventListener(
+        "input",
+        drawTransition
+    );
+
+
+/* =========================================================
+   ANSWER
+========================================================= */
+
+function showAnswer() {
+
+    const answer =
+        document.getElementById("answer");
+
+    if (answer.style.display === "block") {
+
+        answer.style.display = "none";
+
+    }
+
+    else {
+
+        answer.style.display = "block";
+
+    }
+
+}
+
+
+/* =========================================================
+   CHANNEL EXPLORER
+========================================================= */
+
+const channelCanvas =
+    document.getElementById("channelCanvas");
+
+const channelCtx =
+    channelCanvas.getContext("2d");
+
+
+const baseCanvas =
+    document.createElement("canvas");
+
+baseCanvas.width = 800;
+baseCanvas.height = 400;
+
+const baseCtx =
+    baseCanvas.getContext("2d");
+
+
+function createScene() {
+
+    const gradient =
+        baseCtx.createLinearGradient(
+            0, 0,
+            800, 400
+        );
+
+
+    gradient.addColorStop(
+        0,
+        "#173f67"
+    );
+
+    gradient.addColorStop(
+        0.5,
+        "#e7ad3e"
+    );
+
+    gradient.addColorStop(
+        1,
+        "#71347e"
+    );
+
+
+    baseCtx.fillStyle = gradient;
+
+    baseCtx.fillRect(
+        0,
+        0,
+        800,
+        400
+    );
+
+
+    /* Green object */
+
+    baseCtx.fillStyle = "#39b86a";
+
+    baseCtx.beginPath();
+
+    baseCtx.arc(
+        180,
+        210,
+        115,
+        0,
+        Math.PI * 2
+    );
+
+    baseCtx.fill();
+
+
+    /* Red object */
+
+    baseCtx.fillStyle = "#e54855";
+
+    baseCtx.fillRect(
+        320,
+        90,
+        180,
+        230
+    );
+
+
+    /* Blue object */
+
+    baseCtx.fillStyle = "#287bd0";
+
+    baseCtx.beginPath();
+
+    baseCtx.arc(
+        620,
+        210,
+        105,
+        0,
+        Math.PI * 2
+    );
+
+    baseCtx.fill();
+
+
+    /* Yellow */
+
+    baseCtx.fillStyle = "#f2df48";
+
+    baseCtx.fillRect(
+        100,
+        65,
+        110,
+        60
+    );
+
+
+    /* Purple */
+
+    baseCtx.fillStyle = "#bd54c1";
+
+    baseCtx.fillRect(
+        560,
+        60,
+        120,
+        60
+    );
+
+
+    baseCtx.fillStyle = "white";
+
+    baseCtx.font =
+        "bold 25px Arial";
+
+    baseCtx.fillText(
+        "COLOR IMAGE",
+        25,
+        375
+    );
+
+}
+
+
+createScene();
+
+
+let currentChannel =
+    "original";
+
+
+function drawChannel(mode) {
+
+    currentChannel = mode;
+
+
+    const source =
+        baseCtx.getImageData(
+            0,
+            0,
+            800,
+            400
+        );
+
+
+    const output =
+        channelCtx.createImageData(
+            800,
+            400
+        );
+
+
+    for (
+        let i = 0;
+        i < source.data.length;
+        i += 4
+    ) {
+
+        const R =
+            source.data[i];
+
+        const G =
+            source.data[i + 1];
+
+        const B =
+            source.data[i + 2];
+
+        const A =
+            source.data[i + 3];
+
+
+        if (mode === "original") {
+
+            output.data[i] = R;
+            output.data[i + 1] = G;
+            output.data[i + 2] = B;
+
+        }
+
+        else {
+
+            let value;
+
+
+            if (mode === "red") {
+
+                value = R;
+
+            }
+
+            else if (mode === "green") {
+
+                value = G;
+
+            }
+
+            else {
+
+                value = B;
+
+            }
+
+
+            /*
+               Show the channel as grayscale
+
+               Bright = high channel value
+               Dark   = low channel value
+            */
+
+            output.data[i] = value;
+            output.data[i + 1] = value;
+            output.data[i + 2] = value;
+
+        }
+
+
+        output.data[i + 3] = A;
+
+    }
+
+
+    channelCtx.putImageData(
+        output,
+        0,
+        0
+    );
+
+
+    const messages = {
+
+        original:
+        "<b>Original:</b> Red + Green + Blue work together to produce the final color",
+
+        red:
+        "<b>Red Channel:</b> Bright areas have high R values & Dark areas have low R values",
+
+        green:
+        "<b>Green Channel:</b> Bright areas have high G values & Dark areas have low G values",
+
+        blue:
+        "<b>Blue Channel:</b> Bright areas have high B values & Dark areas have low B values"
+
+    };
+
+
+    document.getElementById("channelInfo")
+        .innerHTML =
+        messages[mode];
+
+}
+
+
+/* =========================================================
+   PIXEL INSPECTION
+========================================================= */
+
+const inspectCanvas =
+    document.getElementById("inspectCanvas");
+
+const inspectCtx =
+    inspectCanvas.getContext("2d");
+
+
+function drawInspection() {
+
+    const R = Number(red.value);
+    const G = Number(green.value);
+    const B = Number(blue.value);
+
+
+    /*
+       Create a field containing many slightly
+       different pixels
+    */
+
+    for (
+        let y = 0;
+        y < 8;
+        y++
+    ) {
+
+        for (
+            let x = 0;
+            x < 16;
+            x++
+        ) {
+
+            let rr =
+                Math.max(
+                    0,
+                    Math.min(
+                        255,
+                        R + (x - 8) * 12
+                    )
+                );
+
+
+            let gg =
+                Math.max(
+                    0,
+                    Math.min(
+                        255,
+                        G + (y - 4) * 15
+                    )
+                );
+
+
+            let bb =
+                Math.max(
+                    0,
+                    Math.min(
+                        255,
+                        B + (x - y) * 8
+                    )
+                );
+
+
+            inspectCtx.fillStyle =
+                `rgb(${rr},${gg},${bb})`;
+
+
+            inspectCtx.fillRect(
+                x * 50,
+                y * 50,
+                50,
+                50
+            );
+
+        }
+
+    }
+
+}
+
+
+inspectCanvas.addEventListener(
+    "click",
+    function(event) {
+
+        const rect =
+            inspectCanvas.getBoundingClientRect();
+
+
+        const x =
+            Math.floor(
+                (event.clientX - rect.left)
+                *
+                inspectCanvas.width
+                /
+                rect.width
+            );
+
+
+        const y =
+            Math.floor(
+                (event.clientY - rect.top)
+                *
+                inspectCanvas.height
+                /
+                rect.height
+            );
+
+
+        const pixel =
+            inspectCtx.getImageData(
+                x,
+                y,
+                1,
+                1
+            ).data;
+
+
+        const R = pixel[0];
+        const G = pixel[1];
+        const B = pixel[2];
+
+
+        const gray =
+            grayscaleValue(
+                R,
+                G,
+                B
+            );
+
+
+        document.getElementById("pixelInfo")
+            .innerHTML =
+
+            `<b>Pixel at (x=${x}, y=${y})</b>
+            <br><br>
+
+            RGB → [${R}, ${G}, ${B}]
+
+            <br>
+
+            BGR → [${B}, ${G}, ${R}]
+
+            <br>
+
+            Grayscale intensity → ${gray}
+
+            <br><br>
+
+            <b>OpenCV:</b>
+
+            img[y, x] → [${B}, ${G}, ${R}]`;
+
+    }
+);
+
+
+/* =========================================================
+   INITIALIZE
+========================================================= */
+
+[red, green, blue].forEach(
+    slider => {
+
+        slider.addEventListener(
+            "input",
+            updateRGB
+        );
+
+    }
+);
+
+
+updateRGB();
+
+drawChannel("original");
+
+</script>
+
+</body>
+</html>

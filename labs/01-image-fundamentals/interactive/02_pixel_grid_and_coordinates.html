@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Interactive Pixel Grid & Coordinates</title>
+<style>
+body{font-family:Arial,sans-serif;background:#f4f6f8;color:#1f2937;margin:0}
+header{background:#1f2937;color:white;padding:22px}main{max-width:1100px;margin:22px auto;padding:0 18px}
+.card{background:white;padding:22px;margin-bottom:22px;border-radius:14px;box-shadow:0 3px 12px #0001}
+.layout{display:grid;grid-template-columns:minmax(300px,1fr) 300px;gap:20px}
+.intro{background:#eef6ff;border-left:5px solid #3b82f6;padding:14px;line-height:1.5}
+canvas{border:2px solid #cbd5e1;border-radius:8px;cursor:crosshair;display:block}
+#gridCanvas{width:min(100%,500px);aspect-ratio:1}
+.info{background:#f8fafc;padding:16px;border-radius:10px}
+.row{display:flex;justify-content:space-between;padding:9px;border-bottom:1px solid #ddd}
+.num{font-family:Consolas,monospace;font-weight:bold}
+.swatch{width:80px;height:80px;border:2px solid #bbb;border-radius:8px;margin:12px 0}
+table{border-collapse:collapse;margin:18px auto;font-family:Consolas,monospace}
+th,td{border:1px solid #94a3b8;min-width:58px;height:48px;text-align:center}
+th{background:#e2e8f0}td{cursor:pointer}td.selected{outline:4px solid #ef4444;outline-offset:-4px;font-weight:bold}
+.code{background:#111827;color:#eee;padding:14px;border-radius:8px;font-family:Consolas,monospace;white-space:pre-wrap}
+.controls{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}
+@media(max-width:750px){.layout{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header><h1>🖼️ Interactive Image Explorer</h1><p>Pixel Grid + Image Coordinates</p></header>
+<main>
+
+<section class="card">
+<h2>1️⃣ Pixel Grid (Image = Matrix) </h2>
+<div class="intro">Click any pixel. The selected pixel and its matrix cell will be highlighted.</div>
+<div class="layout" style="margin-top:18px">
+<div><canvas id="gridCanvas" width="500" height="500"></canvas></div>
+<div class="info">
+<h3>Selected Pixel</h3>
+<div class="row"><span>Row (y)</span><span class="num" id="gy">2</span></div>
+<div class="row"><span>Column (x)</span><span class="num" id="gx">3</span></div>
+<div class="row"><span>Value</span><span class="num" id="gv">255</span></div>
+<div class="swatch" id="gs"></div>
+<div class="code">img[<span id="cy">2</span>, <span id="cx">3</span>]</div>
+</div>
+</div>
+<table id="matrix"></table>
+</section>
+
+<section class="card">
+<h2>2️⃣ Image Coordinates </h2>
+<div class="intro">Upload an image then move your mouse over it and you will see X, Y and the pixel's RGB/BGR values</div>
+<div class="controls">
+<input type="file" id="file" accept="image/*">
+<button id="reset">Reset Demo</button>
+<label>Zoom:
+<select id="zoom"><option>1</option><option selected>2</option><option>4</option><option>8</option></select>
+×</label>
+</div>
+<div class="layout">
+<div><canvas id="imgCanvas"></canvas><p id="status">Demo image</p></div>
+<div class="info">
+<h3>Mouse Position</h3>
+<div class="row"><span>X (column)</span><span class="num" id="mx">—</span></div>
+<div class="row"><span>Y (row)</span><span class="num" id="my">—</span></div>
+<h3>Pixel Value</h3>
+<div class="row"><span>R</span><span class="num" id="r">—</span></div>
+<div class="row"><span>G</span><span class="num" id="g">—</span></div>
+<div class="row"><span>B</span><span class="num" id="b">—</span></div>
+<div class="swatch" id="ms"></div>
+<p>RGB: <b id="rgb">—</b></p><p>BGR (OpenCV): <b id="bgr">—</b></p>
+<div class="code">img[<span id="mcy">y</span>, <span id="mcx">x</span>]</div>
+</div>
+</div>
+</section>
+
+<section class="card">
+<h2>3️⃣ Connect It to OpenCV</h2>
+<div class="code">img[y, x]
+
+B, G, R = img[y, x]
+
+print("Blue:", B)
+print("Green:", G)
+print("Red:", R)</div>
+</section>
+</main>
+
+<script>
+const grid=[
+[20,20,20,20,20],
+[20,20,255,255,20],
+[20,20,255,255,20],
+[20,20,20,20,20],
+[20,20,20,20,20]];
+let sy=2,sx=3;
+const gc=document.getElementById("gridCanvas"),ctx=gc.getContext("2d");
+
+function drawGrid(){
+ctx.clearRect(0,0,500,500);
+for(let y=0;y<5;y++)for(let x=0;x<5;x++){
+let v=grid[y][x];
+ctx.fillStyle=`rgb(${v},${v},${v})`;ctx.fillRect(x*100,y*100,100,100);
+ctx.strokeStyle="#64748b";ctx.lineWidth=2;ctx.strokeRect(x*100,y*100,100,100);
+if(x===sx&&y===sy){ctx.strokeStyle="#ef4444";ctx.lineWidth=7;ctx.strokeRect(x*100+3,y*100+3,94,94)}
+}}
+function pick(y,x){sy=y;sx=x;drawGrid();updateGrid()}
+function updateGrid(){
+let v=grid[sy][sx];
+gy.textContent=sy;gx.textContent=sx;gv.textContent=v;cy.textContent=sy;cx.textContent=sx;
+gs.style.background=`rgb(${v},${v},${v})`;
+let s="<tr><th>y \\ x</th>";
+for(let x=0;x<5;x++)s+=`<th>${x}</th>`;s+="</tr>";
+for(let y=0;y<5;y++){s+=`<tr><th>${y}</th>`;
+for(let x=0;x<5;x++){let z=grid[y][x];s+=`<td class="${x===sx&&y===sy?'selected':''}" style="background:rgb(${z},${z},${z});color:${z<130?'white':'black'}" onclick="pick(${y},${x})">${z}</td>`}
+s+="</tr>"}matrix.innerHTML=s;
+}
+gc.onclick=e=>{let r=gc.getBoundingClientRect();let x=Math.floor((e.clientX-r.left)/r.width*5),y=Math.floor((e.clientY-r.top)/r.height*5);if(x>=0&&x<5&&y>=0&&y<5)pick(y,x)}
+drawGrid();updateGrid();
+
+const ic=document.getElementById("imgCanvas"),ictx=ic.getContext("2d",{willReadFrequently:true});
+let img=new Image();
+
+function load(src,label){let n=new Image();n.onload=()=>{img=n;status.textContent=`${label} — ${n.naturalWidth} × ${n.naturalHeight} pixels`;drawImage()};n.src=src}
+function demo(){
+let c=document.createElement("canvas");c.width=640;c.height=420;let x=c.getContext("2d");
+let g=x.createLinearGradient(0,0,640,420);g.addColorStop(0,"#bfdbfe");g.addColorStop(1,"#fef3c7");
+x.fillStyle=g;x.fillRect(0,0,640,420);
+x.fillStyle="#2563eb";x.beginPath();x.arc(170,190,90,0,Math.PI*2);x.fill();
+x.fillStyle="#f59e0b";x.fillRect(310,105,190,170);
+x.fillStyle="#111827";x.font="bold 30px Arial";x.fillText("MOVE YOUR MOUSE",185,350);
+load(c.toDataURL(),"Demo image")}
+function drawImage(){
+if(!img.complete)return;
+ic.width=img.naturalWidth;ic.height=img.naturalHeight;
+let z=+zoom.value;ic.style.width=img.naturalWidth*z+"px";ic.style.maxWidth="none";
+ictx.drawImage(img,0,0)}
+file.onchange=e=>{let f=e.target.files[0];if(!f)return;let rd=new FileReader();rd.onload=()=>load(rd.result,f.name);rd.readAsDataURL(f)}
+zoom.onchange=drawImage;reset.onclick=demo;
+
+ic.onmousemove=e=>{
+let rect=ic.getBoundingClientRect();
+let x=Math.floor((e.clientX-rect.left)*ic.width/rect.width);
+let y=Math.floor((e.clientY-rect.top)*ic.height/rect.height);
+if(x<0||y<0||x>=ic.width||y>=ic.height)return;
+let p=ictx.getImageData(x,y,1,1).data,r=p[0],g=p[1],b=p[2];
+mx.textContent=x;my.textContent=y;document.getElementById("r").textContent=r;document.getElementById("g").textContent=g;document.getElementById("b").textContent=b;
+rgb.textContent=`(${r}, ${g}, ${b})`;bgr.textContent=`(${b}, ${g}, ${r})`;mcy.textContent=y;mcx.textContent=x;
+ms.style.background=`rgb(${r},${g},${b})`;
+};
+demo();
+</script>
+</body>
+</html>

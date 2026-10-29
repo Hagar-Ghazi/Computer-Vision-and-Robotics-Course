@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Interactive Pixels - Computer Vision Lab 1</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            color: #222;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 35px;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 18px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        }
+
+        .card h2 {
+            text-align: center;
+            margin-top: 0;
+        }
+
+        .color-box {
+            width: 220px;
+            height: 220px;
+            margin: 25px auto;
+            border-radius: 15px;
+            border: 2px solid #ddd;
+            background: rgb(255, 0, 0);
+        }
+
+        .grayscale-box {
+            width: 220px;
+            height: 220px;
+            margin: 25px auto;
+            border-radius: 15px;
+            border: 2px solid #ddd;
+            background: rgb(128, 128, 128);
+        }
+
+        .channel {
+            margin: 22px 0;
+        }
+
+        .channel-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            cursor: pointer;
+        }
+
+        input[type="number"] {
+            width: 75px;
+            padding: 8px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        .value {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .rgb-result {
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+            margin-top: 25px;
+        }
+
+        .grayscale-result {
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+            margin-top: 25px;
+        }
+
+        .explanation {
+            margin-top: 25px;
+            padding: 15px;
+            background: #f1f3f5;
+            border-radius: 10px;
+            line-height: 1.6;
+        }
+
+        .scale {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .rgb-label {
+            font-weight: bold;
+        }
+
+        .red {
+            color: red;
+        }
+
+        .green {
+            color: green;
+        }
+
+        .blue {
+            color: blue;
+        }
+
+        @media (max-width: 800px) {
+            .cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>🖼️ Interactive Pixels</h1>
+
+    <p class="subtitle">
+        Lab 1: Reading and Displaying Images
+    </p>
+
+
+    <div class="cards">
+
+        <!-- ================= RGB ================= -->
+
+        <div class="card">
+
+            <h2>🌈 RGB Pixel</h2>
+
+            <div id="rgbColor" class="color-box"></div>
+
+            <!-- RED -->
+
+            <div class="channel">
+
+                <div class="channel-header">
+
+                    <span class="red">Red</span>
+
+                    <div class="value">
+                        <input
+                            type="number"
+                            id="redNumber"
+                            min="0"
+                            max="255"
+                            value="255"
+                        >
+                    </div>
+
+                </div>
+
+                <input
+                    type="range"
+                    id="redSlider"
+                    min="0"
+                    max="255"
+                    value="255"
+                >
+
+            </div>
+
+
+            <!-- GREEN -->
+
+            <div class="channel">
+
+                <div class="channel-header">
+
+                    <span class="green">Green</span>
+
+                    <div class="value">
+                        <input
+                            type="number"
+                            id="greenNumber"
+                            min="0"
+                            max="255"
+                            value="0"
+                        >
+                    </div>
+
+                </div>
+
+                <input
+                    type="range"
+                    id="greenSlider"
+                    min="0"
+                    max="255"
+                    value="0"
+                >
+
+            </div>
+
+
+            <!-- BLUE -->
+
+            <div class="channel">
+
+                <div class="channel-header">
+
+                    <span class="blue">Blue</span>
+
+                    <div class="value">
+                        <input
+                            type="number"
+                            id="blueNumber"
+                            min="0"
+                            max="255"
+                            value="0"
+                        >
+                    </div>
+
+                </div>
+
+                <input
+                    type="range"
+                    id="blueSlider"
+                    min="0"
+                    max="255"
+                    value="0"
+                >
+
+            </div>
+
+
+            <div class="rgb-result">
+
+                RGB =
+                (
+                <span id="redValue">255</span>,
+                <span id="greenValue">0</span>,
+                <span id="blueValue">0</span>
+                )
+
+            </div>
+
+
+            <div class="explanation">
+
+                <strong>Each color pixel contains 3 values:</strong>
+
+                <br><br>
+
+                🔴 Red: <strong>0 → 255</strong>
+                <br>
+
+                🟢 Green: <strong>0 → 255</strong>
+                <br>
+
+                🔵 Blue: <strong>0 → 255</strong>
+
+                <br><br>
+
+                Try changing the three values and watch the color change
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ================= GRAYSCALE ================= -->
+
+        <div class="card">
+
+            <h2>⚫ Grayscale Pixel</h2>
+
+            <div id="grayColor" class="grayscale-box"></div>
+
+
+            <div class="channel">
+
+                <div class="channel-header">
+
+                    <span>Brightness</span>
+
+                    <input
+                        type="number"
+                        id="grayNumber"
+                        min="0"
+                        max="255"
+                        value="128"
+                    >
+
+                </div>
+
+
+                <input
+                    type="range"
+                    id="graySlider"
+                    min="0"
+                    max="255"
+                    value="128"
+                >
+
+
+                <div class="scale">
+
+                    <span>0 = Black</span>
+
+                    <span>255 = White</span>
+
+                </div>
+
+            </div>
+
+
+            <div class="grayscale-result">
+
+                Grayscale =
+                <span id="grayValue">128</span>
+
+            </div>
+
+
+            <div class="explanation">
+
+                <strong>A grayscale pixel contains only ONE value</strong>
+
+                <br><br>
+
+                0 → Black
+
+                <br>
+
+                128 → Gray
+
+                <br>
+
+                255 → White
+
+                <br><br>
+
+                Move the slider and see how the brightness changes
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    // =========================================
+    // RGB ELEMENTS
+    // =========================================
+
+    const redSlider = document.getElementById("redSlider");
+    const greenSlider = document.getElementById("greenSlider");
+    const blueSlider = document.getElementById("blueSlider");
+
+    const redNumber = document.getElementById("redNumber");
+    const greenNumber = document.getElementById("greenNumber");
+    const blueNumber = document.getElementById("blueNumber");
+
+    const rgbColor = document.getElementById("rgbColor");
+
+    const redValue = document.getElementById("redValue");
+    const greenValue = document.getElementById("greenValue");
+    const blueValue = document.getElementById("blueValue");
+
+
+    // =========================================
+    // UPDATE RGB COLOR
+    // =========================================
+
+    function updateRGB() {
+
+        let r = Number(redSlider.value);
+        let g = Number(greenSlider.value);
+        let b = Number(blueSlider.value);
+
+
+        // Change the color box
+
+        rgbColor.style.backgroundColor =
+            `rgb(${r}, ${g}, ${b})`;
+
+
+        // Update numbers
+
+        redNumber.value = r;
+        greenNumber.value = g;
+        blueNumber.value = b;
+
+
+        redValue.textContent = r;
+        greenValue.textContent = g;
+        blueValue.textContent = b;
+    }
+
+
+    // =========================================
+    // SLIDER EVENTS
+    // =========================================
+
+    redSlider.addEventListener("input", updateRGB);
+
+    greenSlider.addEventListener("input", updateRGB);
+
+    blueSlider.addEventListener("input", updateRGB);
+
+
+    // =========================================
+    // NUMBER INPUT EVENTS
+    // =========================================
+
+    redNumber.addEventListener("input", function () {
+
+        let value = Math.min(255, Math.max(0, Number(this.value)));
+
+        redSlider.value = value;
+
+        updateRGB();
+    });
+
+
+    greenNumber.addEventListener("input", function () {
+
+        let value = Math.min(255, Math.max(0, Number(this.value)));
+
+        greenSlider.value = value;
+
+        updateRGB();
+    });
+
+
+    blueNumber.addEventListener("input", function () {
+
+        let value = Math.min(255, Math.max(0, Number(this.value)));
+
+        blueSlider.value = value;
+
+        updateRGB();
+    });
+
+
+
+    // =========================================
+    // GRAYSCALE
+    // =========================================
+
+    const graySlider = document.getElementById("graySlider");
+
+    const grayNumber = document.getElementById("grayNumber");
+
+    const grayColor = document.getElementById("grayColor");
+
+    const grayValue = document.getElementById("grayValue");
+
+
+    function updateGrayscale() {
+
+        let value = Number(graySlider.value);
+
+
+        // Grayscale means:
+        // R = G = B = value
+
+        grayColor.style.backgroundColor =
+            `rgb(${value}, ${value}, ${value})`;
+
+
+        grayNumber.value = value;
+
+        grayValue.textContent = value;
+    }
+
+
+    // Slider
+
+    graySlider.addEventListener(
+        "input",
+        updateGrayscale
+    );
+
+
+    // Number
+
+    grayNumber.addEventListener("input", function () {
+
+        let value = Math.min(255, Math.max(0, Number(this.value)));
+
+        graySlider.value = value;
+
+        updateGrayscale();
+
+    });
+
+
+    // =========================================
+    // INITIAL UPDATE
+    // =========================================
+
+    updateRGB();
+
+    updateGrayscale();
+
+</script>
+
+</body>
+</html>

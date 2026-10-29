@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Zoom into Pixels</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        background: #f4f4f4;
+        padding: 30px;
+    }
+
+    h1 {
+        font-size: 32px;
+    }
+
+    .subtitle {
+        color: #555;
+        font-size: 18px;
+    }
+
+    .buttons {
+        margin: 25px;
+    }
+
+    button {
+        padding: 12px 22px;
+        margin: 5px;
+        font-size: 17px;
+        border: none;
+        border-radius: 8px;
+        background: #222;
+        color: white;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background: #555;
+    }
+
+    #zoomText {
+        font-size: 24px;
+        font-weight: bold;
+        margin: 20px;
+    }
+
+    /* Image area */
+    .viewer {
+        width: 600px;
+        height: 450px;
+        margin: auto;
+        background: white;
+        border: 3px solid #333;
+        overflow: hidden;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    #canvas {
+        max-width: 100%;
+        max-height: 100%;
+    }
+
+    .explanation {
+        margin: 30px auto;
+        max-width: 700px;
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        font-size: 19px;
+        line-height: 1.6;
+    }
+
+    .big {
+        font-size: 25px;
+        font-weight: bold;
+    }
+
+</style>
+</head>
+
+<body>
+
+<h1>🔍 Zoom into Pixels</h1>
+
+<p class="subtitle">
+    What does a computer actually see when it looks at an image?
+</p>
+
+
+<div class="buttons">
+
+    <button onclick="setZoom(1)">1×</button>
+
+    <button onclick="setZoom(2)">2×</button>
+
+    <button onclick="setZoom(5)">5×</button>
+
+    <button onclick="setZoom(10)">10×</button>
+
+    <button onclick="setZoom(20)">20×</button>
+
+</div>
+
+
+<div id="zoomText">
+    Zoom: 1×
+</div>
+
+
+<div class="viewer">
+
+    <canvas id="canvas"></canvas>
+
+</div>
+
+
+<div class="explanation">
+
+    <p id="message">
+        🖼️ This looks like one image to us
+    </p>
+
+</div>
+
+
+<script>
+
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+const img = new Image();
+
+img.crossOrigin = "anonymous";
+
+img.src =
+"https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500";
+
+
+img.onload = function() {
+
+    /*
+        Make the image small internally
+
+        This is important because we want
+        the pixels to become visible
+    */
+
+    canvas.width = 40;
+    canvas.height = 40;
+
+    ctx.drawImage(img, 0, 0, 40, 40);
+
+    setZoom(1);
+};
+
+
+function setZoom(level) {
+
+    document.getElementById("zoomText").innerText =
+        "Zoom: " + level + "×";
+
+
+    /*
+        Normal image
+    */
+
+    if (level <= 5) {
+
+        canvas.style.width = (250 * level) + "px";
+
+        canvas.style.height = (250 * level) + "px";
+
+        canvas.style.imageRendering = "auto";
+
+        drawNormal();
+
+        document.getElementById("message").innerHTML =
+            level === 1
+            ? "🖼️ To our eyes this looks like one smooth image"
+            : "🔍 We are zooming in but the individual pixels are still difficult to see";
+
+    }
+
+
+    /*
+        Pixel mode
+    */
+
+    else {
+
+        canvas.style.width = (40 * level) + "px";
+
+        canvas.style.height = (40 * level) + "px";
+
+        canvas.style.imageRendering = "pixelated";
+
+        drawPixels(level);
+
+        document.getElementById("message").innerHTML =
+            "🟦 Each square is a <b>pixel</b><br>" +
+            "The computer represents the image as a grid of pixels";
+
+    }
+
+}
+
+
+function drawNormal() {
+
+    ctx.clearRect(0, 0, 40, 40);
+
+    ctx.drawImage(img, 0, 0, 40, 40);
+
+}
+
+
+function drawPixels(level) {
+
+    ctx.clearRect(0, 0, 40, 40);
+
+    ctx.drawImage(img, 0, 0, 40, 40);
+
+    /*
+        Draw a grid over the pixels
+    */
+
+    if (level >= 10) {
+
+        ctx.strokeStyle = "rgba(0,0,0,0.45)";
+
+        ctx.lineWidth = 0.08;
+
+        for (let x = 0; x <= 40; x++) {
+
+            ctx.beginPath();
+
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, 40);
+
+            ctx.stroke();
+        }
+
+
+        for (let y = 0; y <= 40; y++) {
+
+            ctx.beginPath();
+
+            ctx.moveTo(0, y);
+            ctx.lineTo(40, y);
+
+            ctx.stroke();
+        }
+
+    }
+
+}
+
+</script>
+
+</body>
+</html>

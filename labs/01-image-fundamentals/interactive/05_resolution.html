@@ -1,0 +1,1427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Image Resolution</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f4f6fa;
+    color: #172033;
+}
+
+.container {
+    max-width: 1200px;
+    margin: auto;
+    padding: 30px;
+}
+
+h1 {
+    margin-bottom: 8px;
+}
+
+.subtitle {
+    color: #667085;
+    margin-bottom: 28px;
+}
+
+.card {
+    background: white;
+    border: 1px solid #dde3ed;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 22px;
+    box-shadow: 0 5px 18px rgba(0,0,0,0.05);
+}
+
+h2 {
+    margin-top: 0;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+
+@media(max-width: 850px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+/* Resolution buttons */
+
+.resolution-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 20px 0;
+}
+
+.resolution-buttons button {
+    padding: 12px 17px;
+    border: 1px solid #cbd3df;
+    border-radius: 9px;
+    background: white;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.resolution-buttons button:hover {
+    background: #f0f3f8;
+}
+
+.resolution-buttons button.active {
+    background: #dce6ff;
+    border-color: #7c96df;
+}
+
+
+/* Main visual */
+
+.visual-box {
+    background: #eef1f5;
+    border-radius: 14px;
+    padding: 15px;
+    text-align: center;
+}
+
+canvas {
+    width: 100%;
+    max-width: 800px;
+    border-radius: 10px;
+    border: 1px solid #cfd6e2;
+    display: block;
+    margin: auto;
+}
+
+
+/* Statistics */
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-top: 15px;
+}
+
+.stat {
+    background: #f7f9fc;
+    padding: 14px;
+    border-radius: 10px;
+}
+
+.stat-title {
+    color: #667085;
+    font-size: 14px;
+}
+
+.stat-value {
+    font-size: 22px;
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+
+/* Pixel counter */
+
+.big-number {
+    font-size: 42px;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+.bar-container {
+    height: 30px;
+    background: #e7ebf1;
+    border-radius: 15px;
+    overflow: hidden;
+    margin: 15px 0;
+}
+
+.bar {
+    height: 100%;
+    width: 100%;
+    transition: width 0.5s ease;
+}
+
+
+/* Comparison */
+
+.comparison {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.compare-box {
+    background: #f7f9fc;
+    padding: 15px;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.compare-box canvas {
+    margin-top: 10px;
+}
+
+
+/* Question */
+
+.question {
+    background: #fff8e6;
+    border: 1px solid #efd48a;
+    border-radius: 12px;
+    padding: 18px;
+}
+
+.answer {
+    display: none;
+    margin-top: 12px;
+    background: #eef8f1;
+    border-radius: 9px;
+    padding: 14px;
+    line-height: 1.7;
+}
+
+button.answer-btn {
+    padding: 10px 15px;
+    margin-top: 10px;
+    border: 1px solid #cbd3df;
+    background: white;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+
+/* Code */
+
+.code {
+    background: #111827;
+    color: #e5e7eb;
+    border-radius: 10px;
+    padding: 18px;
+    font-family: Consolas, monospace;
+    line-height: 1.65;
+    overflow-x: auto;
+}
+
+.keyword {
+    background: #eef2f7;
+    padding: 6px 10px;
+    border-radius: 7px;
+    font-family: Consolas, monospace;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.explanation {
+    line-height: 1.7;
+}
+
+.highlight-box {
+    background: #eef4ff;
+    border-left: 5px solid #5b78d1;
+    padding: 16px;
+    border-radius: 8px;
+    line-height: 1.7;
+}
+
+</style>
+</head>
+
+
+<body>
+
+<div class="container">
+
+
+<!-- ===================================================== -->
+<!-- HEADER -->
+<!-- ===================================================== -->
+
+<h1>🖼️ Image Resolution — Interactive Lab</h1>
+
+<div class="subtitle">
+
+Understand what resolution really means:
+<b>how many pixels are used to represent an image</b>
+
+</div>
+
+
+
+<!-- ===================================================== -->
+<!-- 1. CONCEPT -->
+<!-- ===================================================== -->
+
+<section class="card">
+
+<h2>1️⃣ What Is Image Resolution?</h2>
+
+<div class="explanation">
+
+<p>
+A digital image is made from a grid of tiny pixels.
+</p>
+
+<p>
+The <b>resolution</b> tells us how many pixels are used
+to represent the image usually expressed as:
+</p>
+
+<div style="text-align:center; margin:20px">
+
+<span class="keyword">
+Width × Height
+</span>
+
+</div>
+
+<p>
+For example:
+</p>
+
+<div class="code">
+
+1920 × 1080
+
+<br><br>
+
+Width = 1920 pixels
+
+<br>
+
+Height = 1080 pixels
+
+<br><br>
+
+Total pixels = 1920 × 1080
+             = 2,073,600 pixels
+
+</div>
+
+</div>
+
+</section>
+
+
+
+<!-- ===================================================== -->
+<!-- 2. INTERACTIVE RESOLUTION -->
+<!-- ===================================================== -->
+
+<section class="card">
+
+<h2>2️⃣ Change the Resolution</h2>
+
+<p>
+
+Choose a resolution and watch what happens to the
+<b>actual number of pixels</b> used to represent the image
+
+</p>
+
+
+<div class="resolution-buttons">
+
+<button
+    class="active"
+    onclick="changeResolution(1920,1080,this)"
+>
+1920 × 1080
+</button>
+
+<button
+    onclick="changeResolution(1280,720,this)"
+>
+1280 × 720
+</button>
+
+<button
+    onclick="changeResolution(640,480,this)"
+>
+640 × 480
+</button>
+
+<button
+    onclick="changeResolution(100,100,this)"
+>
+100 × 100
+</button>
+
+<button
+    onclick="changeResolution(20,20,this)"
+>
+20 × 20
+</button>
+
+</div>
+
+
+<div class="grid">
+
+
+<!-- IMAGE -->
+
+<div class="visual-box">
+
+<h3 id="resolutionTitle">
+1920 × 1080
+</h3>
+
+<canvas
+    id="resolutionCanvas"
+    width="1920"
+    height="1080"
+></canvas>
+
+</div>
+
+
+
+<!-- INFORMATION -->
+
+<div>
+
+<h3>Pixel Information</h3>
+
+
+<div class="stats">
+
+<div class="stat">
+
+<div class="stat-title">
+Width
+</div>
+
+<div
+    class="stat-value"
+    id="widthValue"
+>
+1920
+</div>
+
+</div>
+
+
+<div class="stat">
+
+<div class="stat-title">
+Height
+</div>
+
+<div
+    class="stat-value"
+    id="heightValue"
+>
+1080
+</div>
+
+</div>
+
+
+<div class="stat">
+
+<div class="stat-title">
+Total Pixels
+</div>
+
+<div
+    class="stat-value"
+    id="totalPixels"
+>
+2,073,600
+</div>
+
+</div>
+
+
+<div class="stat">
+
+<div class="stat-title">
+Compared with Original
+</div>
+
+<div
+    class="stat-value"
+    id="percentage"
+>
+100%
+</div>
+
+</div>
+
+</div>
+
+
+<h3 style="margin-top:25px">
+How much pixel information remains?
+</h3>
+
+
+<div class="bar-container">
+
+<div
+    class="bar"
+    id="pixelBar"
+>
+</div>
+
+</div>
+
+
+<p id="pixelExplanation">
+
+This image uses all of the original pixels
+
+</p>
+
+</div>
+
+</div>
+
+</section>
+
+
+
+<!-- ===================================================== -->
+<!-- 3. VISUAL COMPARISON -->
+<!-- ===================================================== -->
+
+<section class="card">
+
+<h2>3️⃣ Visual Comparison</h2>
+
+<p>
+
+Notice something important:
+
+<b>
+The display area can stay almost the same
+while the number of pixels representing the image changes
+</b>
+
+</p>
+
+
+<div class="comparison">
+
+
+<div class="compare-box">
+
+<h3>Original</h3>
+
+<p>
+1920 × 1080
+</p>
+
+<canvas
+    id="originalCanvas"
+    width="1920"
+    height="1080"
+></canvas>
+
+</div>
+
+
+
+<div class="compare-box">
+
+<h3 id="comparisonTitle">
+Current Resolution
+</h3>
+
+<canvas
+    id="comparisonCanvas"
+    width="1920"
+    height="1080"
+></canvas>
+
+</div>
+
+</div>
+
+</section>
+
+
+
+<!-- ===================================================== -->
+<!-- 4. ACTUAL PIXEL INFORMATION -->
+<!-- ===================================================== -->
+
+<section class="card">
+
+<h2>4️⃣ What Does "Fewer Pixels" Actually Mean?</h2>
+
+<div class="highlight-box">
+
+<p>
+
+Suppose we start with:
+
+</p>
+
+<div class="code">
+
+1920 × 1080
+
+= 2,073,600 pixels
+
+</div>
+
+<p>
+
+Now reduce it to:
+
+</p>
+
+<div class="code">
+
+100 × 100
+
+= 10,000 pixels
+
+</div>
+
+<p>
+
+The image is now represented using only
+<b>10,000 pixels instead of 2,073,600 pixels</b>
+
+</p>
+
+</div>
+
+
+<div style="margin-top:20px">
+
+<h3>And at 20 × 20?</h3>
+
+<div class="code">
+
+20 × 20 = 400 pixels
+
+</div>
+
+<p>
+
+Only <b>400 pixels</b> are available to describe
+the entire image
+
+That means much less spatial detail can be represented
+
+</p>
+
+</div>
+
+</section>
+
+
+
+<!-- ===================================================== -->
+<!-- 5. QUESTION -->
+<!-- ===================================================== -->
+
+<section class="card">
+
+<h2>5️⃣ Think About It</h2>
+
+<div class="question">
+
+<b>
+What happens when we reduce the number of pixels?
+</b>
+
+<br><br>
+
+<button
+    class="answer-btn"
+    onclick="showResolutionAnswer()"
+>
+Show Answer
+</button>
+
+
+<div
+    class="answer"
+    id="resolutionAnswer"
+>
+
+When we reduce the number of pixels
+the image contains <b>less spatial information</b>
+
+Fine details can disappear because there are
+fewer pixels available to represent them
+
+So:
+
+<br><br>
+
+<b>
+More pixels → more detail can be represented
+</b>
+
+<br>
+
+<b>
+Fewer pixels → less detail can be represented
+</b>
+
+</div>
+
+</div>
+
+</section>
+
+
+
+<!-- ===================================================== -->
+<!-- 6. OPENCV CONNECTION -->
+<!-- ===================================================== -->
+
+<section class="card">
+
+<h2>6️⃣ Connect It to OpenCV</h2>
+
+<p>
+
+In OpenCV we can change the resolution of an image
+using:
+
+</p>
+
+
+<div class="code">
+
+resized = cv2.resize(
+    img,
+    (100, 100)
+)
+
+</div>
+
+
+<p>
+
+Here:
+
+</p>
+
+<ul>
+
+<li>
+The original image is stored in
+<span class="keyword">img</span>
+</li>
+
+<li>
+The new size is
+<span class="keyword">(100, 100)</span>
+</li>
+
+<li>
+OpenCV creates a new image represented by
+100 × 100 pixels
+</li>
+
+</ul>
+
+
+<div class="highlight-box">
+
+<b>Important:</b>
+
+<br><br>
+
+The second argument is:
+
+<br><br>
+
+<span class="keyword">(width, height)</span>
+
+<br><br>
+
+So:
+
+<br>
+
+<span class="keyword">(100, 100)</span>
+
+means:
+
+<br>
+
+100 pixels wide × 100 pixels high.
+
+</div>
+
+</section>
+
+
+
+<!-- ===================================================== -->
+<!-- 7. FINAL IDEA -->
+<!-- ===================================================== -->
+
+<section class="card">
+
+<h2>7️⃣ Final Mental Model</h2>
+
+<div class="code">
+
+HIGH RESOLUTION
+
+1920 × 1080  =  2,073,600 pixels  -->
+ 
+More pixels available
+to represent spatial details
+
+
+<br><br>
+
+
+LOWER RESOLUTION
+
+100 × 100 =  10,000 pixels -->
+
+Fewer pixels available
+to represent spatial details
+
+
+<br><br>
+
+
+VERY LOW RESOLUTION
+
+20 × 20 =  400 pixels -->
+
+Very limited spatial detail
+
+</div>
+
+</section>
+
+
+</div>
+
+
+
+<script>
+
+
+/* =========================================================
+   ORIGINAL IMAGE
+========================================================= */
+
+const originalCanvas =
+    document.getElementById("originalCanvas");
+
+const originalCtx =
+    originalCanvas.getContext("2d");
+
+
+/*
+    Create a detailed demo image
+
+    We use a generated image so the HTML works
+    without downloading an external image
+*/
+
+function createDemoImage(ctx, width, height) {
+
+    /* Background */
+
+    const gradient =
+        ctx.createLinearGradient(
+            0,
+            0,
+            width,
+            height
+        );
+
+    gradient.addColorStop(
+        0,
+        "#173f67"
+    );
+
+    gradient.addColorStop(
+        0.45,
+        "#e7ad3e"
+    );
+
+    gradient.addColorStop(
+        1,
+        "#71347e"
+    );
+
+    ctx.fillStyle = gradient;
+
+    ctx.fillRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+
+    /* Large circle */
+
+    ctx.fillStyle = "#35a967";
+
+    ctx.beginPath();
+
+    ctx.arc(
+        480,
+        540,
+        250,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fill();
+
+
+    /* Rectangle */
+
+    ctx.fillStyle = "#e44b55";
+
+    ctx.fillRect(
+        800,
+        300,
+        400,
+        500
+    );
+
+
+    /* Blue circle */
+
+    ctx.fillStyle = "#287bd0";
+
+    ctx.beginPath();
+
+    ctx.arc(
+        1450,
+        540,
+        230,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fill();
+
+
+    /* Small details */
+
+    ctx.fillStyle = "#f3df48";
+
+    ctx.fillRect(
+        250,
+        150,
+        220,
+        110
+    );
+
+
+    ctx.fillStyle = "#bd54c1";
+
+    ctx.fillRect(
+        1300,
+        130,
+        250,
+        120
+    );
+
+
+    /* Fine lines */
+
+    ctx.strokeStyle = "white";
+
+    ctx.lineWidth = 8;
+
+    for (
+        let i = 0;
+        i < 15;
+        i++
+    ) {
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            50 + i * 120,
+            900
+        );
+
+        ctx.lineTo(
+            120 + i * 120,
+            1020
+        );
+
+        ctx.stroke();
+
+    }
+
+
+    /* Text */
+
+    ctx.fillStyle = "white";
+
+    ctx.font =
+        "bold 100px Arial";
+
+    ctx.fillText(
+        "COMPUTER VISION",
+        400,
+        1000
+    );
+
+}
+
+
+/* Create original */
+
+createDemoImage(
+    originalCtx,
+    1920,
+    1080
+);
+
+
+
+/* =========================================================
+   CURRENT RESOLUTION
+========================================================= */
+
+const resolutionCanvas =
+    document.getElementById(
+        "resolutionCanvas"
+    );
+
+const resolutionCtx =
+    resolutionCanvas.getContext("2d");
+
+
+const comparisonCanvas =
+    document.getElementById(
+        "comparisonCanvas"
+    );
+
+const comparisonCtx =
+    comparisonCanvas.getContext("2d");
+
+
+
+const originalWidth = 1920;
+const originalHeight = 1080;
+
+const originalPixels =
+    originalWidth * originalHeight;
+
+
+
+/* =========================================================
+   CHANGE RESOLUTION
+========================================================= */
+
+function changeResolution(
+    width,
+    height,
+    button
+) {
+
+
+    /* Highlight selected button */
+
+    document
+        .querySelectorAll(
+            ".resolution-buttons button"
+        )
+        .forEach(
+            btn =>
+                btn.classList.remove("active")
+        );
+
+
+    button.classList.add("active");
+
+
+    /* Update text */
+
+    document.getElementById(
+        "resolutionTitle"
+    ).textContent =
+        `${width} × ${height}`;
+
+
+    document.getElementById(
+        "widthValue"
+    ).textContent =
+        width.toLocaleString();
+
+
+    document.getElementById(
+        "heightValue"
+    ).textContent =
+        height.toLocaleString();
+
+
+    const total =
+        width * height;
+
+
+    document.getElementById(
+        "totalPixels"
+    ).textContent =
+        total.toLocaleString();
+
+
+    /* Percentage of original */
+
+    const percentage =
+        (total / originalPixels) * 100;
+
+
+    document.getElementById(
+        "percentage"
+    ).textContent =
+        percentage < 0.01
+            ? percentage.toFixed(4) + "%"
+            : percentage.toFixed(2) + "%";
+
+
+    /*
+        Create a small canvas representing
+        the NEW actual resolution.
+    */
+
+    const smallCanvas =
+        document.createElement("canvas");
+
+    smallCanvas.width = width;
+    smallCanvas.height = height;
+
+    const smallCtx =
+        smallCanvas.getContext("2d");
+
+
+    /*
+        Important:
+
+        This is where the actual reduction
+        happens.
+
+        The original image is resampled into
+        the smaller pixel grid.
+    */
+
+    smallCtx.imageSmoothingEnabled = true;
+
+    smallCtx.drawImage(
+        originalCanvas,
+        0,
+        0,
+        width,
+        height
+    );
+
+
+    /*
+        Display the reduced-resolution image
+        in the large display area
+
+        We stretch it back to the same
+        visual display size
+
+        This helps students understand:
+
+        SAME DISPLAY SIZE
+        ≠
+        SAME NUMBER OF PIXELS
+    */
+
+    resolutionCtx.clearRect(
+        0,
+        0,
+        resolutionCanvas.width,
+        resolutionCanvas.height
+    );
+
+
+    resolutionCtx.imageSmoothingEnabled =
+        false;
+
+
+    resolutionCtx.drawImage(
+        smallCanvas,
+        0,
+        0,
+        resolutionCanvas.width,
+        resolutionCanvas.height
+    );
+
+
+    /* Comparison image */
+
+    comparisonCtx.clearRect(
+        0,
+        0,
+        comparisonCanvas.width,
+        comparisonCanvas.height
+    );
+
+
+    comparisonCtx.imageSmoothingEnabled =
+        false;
+
+
+    comparisonCtx.drawImage(
+        smallCanvas,
+        0,
+        0,
+        comparisonCanvas.width,
+        comparisonCanvas.height
+    );
+
+
+    document.getElementById(
+        "comparisonTitle"
+    ).textContent =
+        `${width} × ${height}`;
+
+
+    /* Pixel information bar */
+
+    const bar =
+        document.getElementById(
+            "pixelBar"
+        );
+
+
+    bar.style.width =
+        Math.max(
+            percentage,
+            0.5
+        ) + "%";
+
+
+    document.getElementById(
+        "pixelExplanation"
+    ).textContent =
+        getExplanation(
+            width,
+            height,
+            total,
+            percentage
+        );
+
+
+    /*
+        At very low resolutions,
+        show a pixel grid.
+    */
+
+    if (
+        width <= 100 &&
+        height <= 100
+    ) {
+
+        drawPixelGrid(
+            resolutionCtx,
+            width,
+            height
+        );
+
+    }
+
+}
+
+
+
+/* =========================================================
+   EXPLANATIONS
+========================================================= */
+
+function getExplanation(
+    width,
+    height,
+    total,
+    percentage
+) {
+
+    if (
+        width === 1920 &&
+        height === 1080
+    ) {
+
+        return `
+        This image uses all ${total.toLocaleString()}
+        original pixels.
+        `;
+
+    }
+
+
+    if (
+        width === 20 &&
+        height === 20
+    ) {
+
+        return `
+        Only ${total} pixels remain.
+        The entire image is represented by a
+        very small pixel grid.
+        `;
+
+    }
+
+
+    if (percentage < 1) {
+
+        return `
+        Only ${percentage.toFixed(2)}% of the
+        original number of pixels remains.
+        `;
+
+    }
+
+
+    return `
+    The image is now represented by
+    ${total.toLocaleString()} pixels
+    instead of ${originalPixels.toLocaleString()}.
+    `;
+
+}
+
+
+
+/* =========================================================
+   PIXEL GRID FOR VERY LOW RESOLUTION
+========================================================= */
+
+function drawPixelGrid(
+    ctx,
+    width,
+    height
+) {
+
+    const cellWidth =
+        resolutionCanvas.width /
+        width;
+
+    const cellHeight =
+        resolutionCanvas.height /
+        height;
+
+
+    ctx.strokeStyle =
+        "rgba(255,255,255,0.35)";
+
+    ctx.lineWidth = 1;
+
+
+    for (
+        let x = 0;
+        x <= width;
+        x++
+    ) {
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            x * cellWidth,
+            0
+        );
+
+        ctx.lineTo(
+            x * cellWidth,
+            resolutionCanvas.height
+        );
+
+        ctx.stroke();
+
+    }
+
+
+    for (
+        let y = 0;
+        y <= height;
+        y++
+    ) {
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            0,
+            y * cellHeight
+        );
+
+        ctx.lineTo(
+            resolutionCanvas.width,
+            y * cellHeight
+        );
+
+        ctx.stroke();
+
+    }
+
+}
+
+
+
+/* =========================================================
+   ANSWER
+========================================================= */
+
+function showResolutionAnswer() {
+
+    const answer =
+        document.getElementById(
+            "resolutionAnswer"
+        );
+
+
+    if (
+        answer.style.display === "block"
+    ) {
+
+        answer.style.display = "none";
+
+    }
+
+    else {
+
+        answer.style.display = "block";
+
+    }
+
+}
+
+
+
+/* =========================================================
+   INITIAL STATE
+========================================================= */
+
+document
+    .querySelector(
+        ".resolution-buttons button"
+    )
+    .click();
+
+</script>
+
+</body>
+</html>
