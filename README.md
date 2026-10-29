@@ -270,7 +270,15 @@ flowchart LR
     M --> L[Locate object<br/>in a new scene]
 ```
 
-**Data** (in [`data/`](labs/05-feature-and-object-detection/data)): `vtest.avi`, `messi5.jpg`, `box.png`, `box_in_scene.png` and `chessboard.png` are the standard [OpenCV sample files](https://github.com/opencv/opencv/tree/4.x/samples/data). `messi_face.jpg` is a crop of `messi5.jpg`, used as the template.
+**Data** (in [`data/`](labs/05-feature-and-object-detection/data))
+
+| File | Used for |
+|---|---|
+| `cat.jpg` | Performance timing, color tracking, thresholding, filtering, corner detection, ORB, feature matching and template matching |
+| `cat_eye_template.png` | The template searched for in `cat.jpg` |
+| `vtest.avi` | Reading and saving video, motion detection (the standard [OpenCV sample video](https://github.com/opencv/opencv/tree/4.x/samples/data)) |
+
+The face and eye detectors load from the cascades that ship with OpenCV (`cv.data.haarcascades`), so they need no extra files. The webcam cells need a connected camera.
 
 ---
 
@@ -315,7 +323,7 @@ Run the notebook from inside its own lab folder, so relative paths such as `cat.
 
 ## Running on Google Colab
 
-Labs 02 and 03 use `ipywidgets` sliders and were built for Google Colab. Labs 01 and 04 also run there. Lab 05 needs a local machine because it opens OpenCV windows.
+Labs 02 and 03 use `ipywidgets` sliders and were built for Google Colab. Labs 01 and 04 also run there. Lab 05 does not run on Colab: it opens OpenCV windows and uses the webcam, so run it locally with Jupyter.
 
 | Lab | Open in Colab |
 |---|---|
